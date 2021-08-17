@@ -13,7 +13,7 @@ app.use(cors());
 
 const { response } = require('express');
 var client = jwksClient({
-  jwksUri: 'https://dev-t18s8k45.us.auth0.com/.well-known/jwks.json'
+  jwksUri: 'https://dev-yaskul-6.us.auth0.com/.well-known/jwks.json'
 });
 
 function getKey(header, callback){
@@ -32,6 +32,11 @@ app.get('/test', (request, response) => {
   // grab the token sent by the front end
   const token = request.headers.authorization.split(' ')[1];
 
+  let client = jwksClient({
+    jwksUri: 'dev-yaskul-6.us.auth0.com/.well-known/jwks.json'
+  });
+
+});
   // the second part is from jet docs
   jwt.verify(token, getKey, {}, function (err, user){
     if(err){
@@ -39,7 +44,7 @@ app.get('/test', (request, response) => {
     }
     resquest.send(user);
   });
-});
+
 
 
 
