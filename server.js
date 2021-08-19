@@ -36,15 +36,15 @@ app.get('/test', (request, response) => {
     jwksUri: 'dev-yaskul-6.us.auth0.com/.well-known/jwks.json'
   });
 
-});
+
   // the second part is from jet docs
   jwt.verify(token, getKey, {}, function (err, user){
     if(err){
       response.status(500).send('invalid token');
     }
-    resquest.send(user);
+    request.send(user);
   });
-
+});
 
 
 
