@@ -1,59 +1,67 @@
+
 'use strict';
 
+// Express Server
 require('dotenv').config();
 const express = require('express');
-const cors = require('cors');
-const jwt = require('jsonwebtoken');
-const jwksClient = require('jwks-rsa');
-
 const app = express();
+
+// Read Data Across Files
+const cors = require('cors');
 app.use(cors());
 
-/////////////////    JSONWEBTOKEN DOCUMENTATION    ///////////////////////
+//Mongoose DB
+const mongoose = require('mongoose');
 
-const { response } = require('express');
-var client = jwksClient({
-  jwksUri: 'https://dev-yaskul-6.us.auth0.com/.well-known/jwks.json'
-});
+// Clear: delete, Seed: post, getBooks: brings back getBooks module.
+const clear = require('./modules/clearDB.js');
+const seed = require('./modules/seed.js');
+const getBooks = require('./modules/getBooks');
 
-function getKey(header, callback){
-  client.getSigningKey(header.kid, function(err, key) {
-    var signingKey = key.publicKey || key.rsaPublicKey;
-    callback(null, signingKey);
-  });
-}
+const BookModel = require('./models/books.js')
 
-/////////////////    ROUTES    /////////////////////////
-
-
+//Setting Port
 const PORT = process.env.PORT || 3001;
 
-app.get('/test', (request, response) => {
-  // grab the token sent by the front end
-  const token = request.headers.authorization.split(' ')[1];
+app.get('/', (request, response) => {
+  response.send('Server is up and running');
+});
 
-  let client = jwksClient({
-    jwksUri: 'dev-yaskul-6.us.auth0.com/.well-known/jwks.json'
+app.get('/books', getBooks) ;
+
+app.get('/clear', clear);
+
+app.get('/seed', seed);
+
+app.get('/allbooks', (request, response) => {
+  console.log("Getting all books")
+  BookModel.find( {} , (error, books) => {
+    if (error) {
+      response.status(500).send('Error: Unable to read All books');
+    } 
+      response.status(200).send(books)
+  })
+})
+
+mongoose.connect('mongodb://127.0.0.1:27017/books',
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
   });
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', _ => {
+  console.log('We\'re Connected to the Database!');
 
 });
-  // the second part is from jet docs
-  jwt.verify(token, getKey, {}, function (err, user){
-    if(err){
-      response.status(500).send('invalid token');
-    }
-    resquest.send(user);
-  });
 
 
-
-
-  // TODO: 
-  // STEP 1: get the jwt from the headers
-  // STEP 2. use the jsonwebtoken library to verify that it is a valid jwt
-  // jsonwebtoken dock - https://www.npmjs.com/package/jsonwebtoken
-  // STEP 3: to prove that everything is working correctly, send the opened jwt back to the front-end
-
-
+// mongoose.connect('mongodb://127.0.0.1:27017/books', {
+//   useNewUrlParser: true,
+//   useUnifiedTopology: true
+// })
+//   .then(() => {
+//     console.log('Connected to the database');
+//   });
 
 app.listen(PORT, () => console.log(`listening on ${PORT}`));
