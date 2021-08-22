@@ -29,10 +29,8 @@ let seed = async (request, response) => {
   let booksdb = await BookModel.find({});
   if (booksdb.length === 0) {
     seedData.map((book) => addNewBook(book));
-    response.send('Seeded three books to the DB');
+    // response.send('Seeded three books to the DB');
   }
 };
-
-
 
 module.exports = seed;

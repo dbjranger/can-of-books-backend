@@ -13,6 +13,4 @@ const getKey = (header, callback) => {
   });
 };
 
-
-
 module.exports = getKey;

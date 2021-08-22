@@ -12,6 +12,4 @@ const clear = async (request, response) => {
   }
 }
 
-
-
 module.exports = clear;
